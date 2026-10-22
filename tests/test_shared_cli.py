@@ -17,12 +17,15 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT = re.search(r'^name = "([a-z-]+)"$', (ROOT / "pyproject.toml").read_text(encoding="utf-8"), re.M)[1]
+_name = re.search(r'^name = "([a-z-]+)"$', (ROOT / "pyproject.toml").read_text(encoding="utf-8"), re.M)
+assert _name is not None, "pyproject.toml has no project name"
+PROJECT = _name[1]
 cli = importlib.import_module(PROJECT.replace("-", "_") + ".cli")
 
 # Three variants: base, +contract --version v2, +v2 availability windows (benefit).
 CLI_SHA256 = {
     "book-benefit-data": "d7d0837be73c71a51a8427fa37875f592caab83c9f709340cce991300b97e20f",
+    "book-bounty-data": "5b4a7327093da486483dc123db547dde3b5c6c5ce6a4f24be084f06c50e6d998",
     "book-competition-data": "5b4a7327093da486483dc123db547dde3b5c6c5ce6a4f24be084f06c50e6d998",
     "book-creator-program-data": "5b4a7327093da486483dc123db547dde3b5c6c5ce6a4f24be084f06c50e6d998",
     "book-deal-data": "5b4a7327093da486483dc123db547dde3b5c6c5ce6a4f24be084f06c50e6d998",
@@ -50,7 +53,7 @@ def live_demo(host):
 
 class VendoredCliTest(unittest.TestCase):
     def test_cli_matches_the_pinned_shared_copy(self):
-        digest = hashlib.sha256(Path(cli.__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        digest = hashlib.sha256(Path(str(cli.__file__)).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
         self.assertIn(PROJECT, CLI_SHA256)
         siblings = sorted(name for name, pinned in CLI_SHA256.items() if pinned == CLI_SHA256[PROJECT])
         self.assertEqual(

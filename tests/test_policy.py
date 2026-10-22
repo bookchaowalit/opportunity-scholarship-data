@@ -8,6 +8,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from importlib.resources import files
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 from urllib.parse import urlsplit
 
@@ -64,7 +65,7 @@ class SourcePolicyTests(unittest.TestCase):
                 self.assertFalse(urlsplit(policy["source_url"]).query)
 
     def test_policy_files_are_enabled_and_duplicates_identical(self):
-        by_id = {}
+        by_id: dict[str, list[Any]] = {}
         for entry in files("book_scholarship_data").iterdir():
             if entry.name.startswith("source") and entry.name.endswith(".json"):
                 policy = json.loads(entry.read_text(encoding="utf-8"))
