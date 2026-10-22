@@ -2,7 +2,7 @@
 title: Scholarships Data Product Charter
 status: local-source-pilot
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-10-22
 tags: [template, data-engineering, data-product, governance]
 description: Outcome, consumers, ownership, contract, quality, privacy, and operating boundary for a data product.
 ---
@@ -19,6 +19,17 @@ description: Outcome, consumers, ownership, contract, quality, privacy, and oper
 | Producer team | Domain repository |
 | Status/review date | Local source pilot / 2026-09-07 |
 | Evidence boundary | schema.json, schema-v2.json, demo.json, source policies, capture adapter and tests in this repository |
+
+## Runtime status (verified 2026-10-22)
+
+| What | Status |
+|---|---|
+| Capture entry point | `python -m book_scholarship_data.capture acquire|records|status` (needs `SOLO_DATA_LAKE_ROOT`, the shared `discovery.capture_runtime` v1 in data-lake-pipelines) |
+| Who calls it | data-lake-pipelines `infra/scripts/discovery/portfolio.py acquire` for the 5 enabled source IDs in `systems/architecture/discovery-portfolio-v1.json`; that portfolio is wired to a 6-hourly Windows task (`setup_windows_task.ps1`). Whether the task is installed and running is **not verified** from this repo (owner decision D6 on the schedule host is open) [ต้องยืนยัน] |
+| Hosted deployment | None. No port, no API, no cloud job |
+| Error reporting | Sentry, opt-in: install the `sentry` extra and set `SENTRY_DSN`; a capture run that exits non-zero sends one event tagged `source_id` (no payload, no PII). No DSN is configured for this product yet [ต้องยืนยัน] |
+| Contract | `book_scholarship_data` `schema.json` (v1 demo) and `schema-v2.json` (captured records); domain-owned, not part of the frozen `data-product-contracts-v2.yaml` port map (the old `opportunity.v1` synthesis is retired, BOO-248) |
+| Quality gates in CI | ruff, ruff format, mypy (gradual, see pyproject), offline pytest with coverage ≥ 87%, CLI smoke on Python 3.10 and 3.13, shared security scan |
 
 ## Product contract
 

@@ -134,3 +134,10 @@ Missing deadlines, fees, selection guarantees and domain terms remain unknown.
 window. No personal eligibility decision is inferred from country or page title.
 Retention is operational in a private local archive; cleanup is manual under the
 repository data lifecycle policy. No automatic deletion or source republication.
+
+## Development
+
+```bash
+uv sync --frozen --all-extras && uv run mypy  # locked env (uv.lock) as CI installs it
+uv run pytest -q --cov
+```
